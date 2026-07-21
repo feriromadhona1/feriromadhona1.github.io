@@ -9,7 +9,7 @@ const nextConfig: NextConfig = {
   },
   basePath: '/feriromadhona-site',
   env: {
-    env: { NEXT_PUBLIC_BASE_PATH: '/feriromadhona-site', },
+    NEXT_PUBLIC_BASE_PATH: '/feriromadhona-site',
   },
 };
 
