@@ -2,6 +2,8 @@ import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 
 const allowedBranches = new Set(["master"]);
+const pagesRepo = "https://github.com/feriromadhona1/feriromadhona1.github.io.git";
+const pagesBranch = "gh-pages";
 
 function run(command, args) {
   execFileSync(command, args, { stdio: "inherit" });
@@ -39,11 +41,13 @@ requireDependency(
   'Package "gh-pages" belum terpasang. Jalankan "npm install" di branch source sebelum deploy.',
 );
 
-console.log(`Deploying branch "${branch}" ke branch "gh-pages"...`);
+console.log(
+  `Deploying branch "${branch}" ke ${pagesRepo} (${pagesBranch})...`,
+);
 
 run("npm", ["run", "build"]);
 
 mkdirSync("out", { recursive: true });
 writeFileSync("out/.nojekyll", "");
 
-run("npx", ["gh-pages", "-d", "out", "-b", "gh-pages"]);
+run("npx", ["gh-pages", "-d", "out", "-b", pagesBranch, "-r", pagesRepo]);
