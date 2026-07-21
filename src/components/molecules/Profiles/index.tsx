@@ -367,7 +367,7 @@ export default function Home() {
             <FaLinkedin />
           </a>
           <a
-            href="https://github.com/feriromadhona"
+            href="https://github.com/feriromadhona1"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="GitHub"
