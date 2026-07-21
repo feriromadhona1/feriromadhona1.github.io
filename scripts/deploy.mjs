@@ -1,18 +1,8 @@
 import { execFileSync } from "node:child_process";
-import {
-  cpSync,
-  existsSync,
-  mkdirSync,
-  mkdtempSync,
-  rmSync,
-  writeFileSync,
-} from "node:fs";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { existsSync } from "node:fs";
 
 const allowedBranches = new Set(["master"]);
-const pagesRepo = "https://github.com/feriromadhona1/feriromadhona1.github.io.git";
-const pagesBranch = "master";
+const sourceBranch = "master";
 
 function run(command, args, cwd) {
   execFileSync(command, args, {
@@ -23,6 +13,12 @@ function run(command, args, cwd) {
 
 function getCurrentBranch() {
   return execFileSync("git", ["rev-parse", "--abbrev-ref", "HEAD"], {
+    encoding: "utf8",
+  }).trim();
+}
+
+function getGitStatus() {
+  return execFileSync("git", ["status", "--porcelain"], {
     encoding: "utf8",
   }).trim();
 }
@@ -38,7 +34,7 @@ const branch = getCurrentBranch();
 
 if (!allowedBranches.has(branch)) {
   console.error(
-    `Deploy diblok dari branch "${branch}". Pindah ke branch "master" untuk publish ke "gh-pages".`,
+    `Deploy diblok dari branch "${branch}". Pindah ke branch "${sourceBranch}" untuk menjalankan deploy.`,
   );
   process.exit(1);
 }
@@ -48,25 +44,16 @@ requireDependency(
   'Dependency belum terpasang. Jalankan "npm install" di branch source sebelum deploy.',
 );
 
-console.log(
-  `Deploying branch "${branch}" ke ${pagesRepo} (${pagesBranch})...`,
-);
+const gitStatus = getGitStatus();
+
+if (gitStatus) {
+  console.error(
+    "Working tree belum bersih. Commit atau stash perubahan dulu sebelum deploy.",
+  );
+  process.exit(1);
+}
+
+console.log(`Building branch "${branch}" lalu push ke origin/${sourceBranch}...`);
 
 run("npm", ["run", "build"]);
-
-mkdirSync("out", { recursive: true });
-writeFileSync("out/.nojekyll", "");
-
-const publishDir = mkdtempSync(join(tmpdir(), "feri-pages-"));
-
-try {
-  cpSync("out", publishDir, { recursive: true });
-  run("git", ["init"], publishDir);
-  run("git", ["checkout", "-B", pagesBranch], publishDir);
-  run("git", ["add", "."], publishDir);
-  run("git", ["commit", "-m", "Deploy site"], publishDir);
-  run("git", ["remote", "add", "origin", pagesRepo], publishDir);
-  run("git", ["push", "--force", "origin", `${pagesBranch}:${pagesBranch}`], publishDir);
-} finally {
-  rmSync(publishDir, { recursive: true, force: true });
-}
+run("git", ["push", "origin", `${sourceBranch}:${sourceBranch}`]);
