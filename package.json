@@ -8,7 +8,7 @@
     "start": "next start",
     "deploy": "node scripts/deploy.mjs"
   },
-  "homepage": "https://feriromadhona1.github.io/feriromadhona-site",
+  "homepage": "https://feriromadhona1.github.io/",
   "dependencies": {
     "clsx": "^2.1.1",
     "framer-motion": "^12.18.1",
