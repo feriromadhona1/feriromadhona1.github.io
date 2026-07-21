@@ -33,8 +33,19 @@ To learn more about Next.js, take a look at the following resources:
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-## Deploy on Vercel
+## Deploy Production
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Production deploy menggunakan **GitHub Pages** dari branch **`master`**.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
+Ringkasnya:
+
+```bash
+git checkout master
+git add .
+git commit -m "update site"
+npm run deploy
+```
+
+Detail branch, alur CI/CD, dan troubleshooting ada di [DEPLOY.md](./DEPLOY.md).
+
+Site live: https://feriromadhona1.github.io/
