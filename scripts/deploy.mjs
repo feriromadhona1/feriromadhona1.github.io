@@ -1,12 +1,24 @@
 import { execFileSync } from "node:child_process";
-import { existsSync, mkdirSync, writeFileSync } from "node:fs";
+import {
+  cpSync,
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 
 const allowedBranches = new Set(["master"]);
 const pagesRepo = "https://github.com/feriromadhona1/feriromadhona1.github.io.git";
-const pagesBranch = "gh-pages";
+const pagesBranch = "master";
 
-function run(command, args) {
-  execFileSync(command, args, { stdio: "inherit" });
+function run(command, args, cwd) {
+  execFileSync(command, args, {
+    stdio: "inherit",
+    ...(cwd ? { cwd } : {}),
+  });
 }
 
 function getCurrentBranch() {
@@ -36,11 +48,6 @@ requireDependency(
   'Dependency belum terpasang. Jalankan "npm install" di branch source sebelum deploy.',
 );
 
-requireDependency(
-  "node_modules/.bin/gh-pages",
-  'Package "gh-pages" belum terpasang. Jalankan "npm install" di branch source sebelum deploy.',
-);
-
 console.log(
   `Deploying branch "${branch}" ke ${pagesRepo} (${pagesBranch})...`,
 );
@@ -50,4 +57,16 @@ run("npm", ["run", "build"]);
 mkdirSync("out", { recursive: true });
 writeFileSync("out/.nojekyll", "");
 
-run("npx", ["gh-pages", "-d", "out", "-b", pagesBranch, "-r", pagesRepo]);
+const publishDir = mkdtempSync(join(tmpdir(), "feri-pages-"));
+
+try {
+  cpSync("out", publishDir, { recursive: true });
+  run("git", ["init"], publishDir);
+  run("git", ["checkout", "-B", pagesBranch], publishDir);
+  run("git", ["add", "."], publishDir);
+  run("git", ["commit", "-m", "Deploy site"], publishDir);
+  run("git", ["remote", "add", "origin", pagesRepo], publishDir);
+  run("git", ["push", "--force", "origin", `${pagesBranch}:${pagesBranch}`], publishDir);
+} finally {
+  rmSync(publishDir, { recursive: true, force: true });
+}
