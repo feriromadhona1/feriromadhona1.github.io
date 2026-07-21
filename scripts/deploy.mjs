@@ -1,7 +1,7 @@
 import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 
-const allowedBranches = new Set(["development", "main", "master"]);
+const allowedBranches = new Set(["master"]);
 
 function run(command, args) {
   execFileSync(command, args, { stdio: "inherit" });
@@ -24,7 +24,7 @@ const branch = getCurrentBranch();
 
 if (!allowedBranches.has(branch)) {
   console.error(
-    `Deploy diblok dari branch "${branch}". Pindah ke salah satu branch source: development, main, atau master.`,
+    `Deploy diblok dari branch "${branch}". Pindah ke branch "master" untuk publish ke "gh-pages".`,
   );
   process.exit(1);
 }
