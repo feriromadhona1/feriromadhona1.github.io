@@ -56,4 +56,6 @@ if (gitStatus) {
 console.log(`Building branch "${branch}" lalu push ke origin/${sourceBranch}...`);
 
 run("npm", ["run", "build"]);
+run("git", ["fetch", "origin"]);
+run("git", ["pull", "--rebase", "origin", sourceBranch]);
 run("git", ["push", "origin", `${sourceBranch}:${sourceBranch}`]);
